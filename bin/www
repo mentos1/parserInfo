@@ -1,0 +1,178 @@
+#!/usr/bin/env node
+
+/**
+ * Module dependencies.
+ */
+
+var app = require('../app');
+var debug = require('debug')('dmgeobot:server');
+var http = require('http');
+const TelegramBot = require('node-telegram-bot-api');
+/**
+ * Get port from environment and store in Express.
+ */
+
+var port = normalizePort(process.env.PORT || '3001');
+app.set('port', port);
+
+/**
+ * Create HTTP server.
+ */
+
+var server = http.createServer(app);
+
+/**
+ * Listen on provided port, on all network interfaces.
+ */
+
+server.listen(port);
+server.on('error', onError);
+server.on('listening', onListening);
+
+/**
+ * Normalize a port into a number, string, or false.
+ */
+
+function normalizePort(val) {
+    var port = parseInt(val, 10);
+
+    if (isNaN(port)) {
+        // named pipe
+        return val;
+    }
+
+    if (port >= 0) {
+        // port number
+        return port;
+    }
+
+    return false;
+}
+
+/**
+ * Event listener for HTTP server "error" event.
+ */
+
+function onError(error) {
+    if (error.syscall !== 'listen') {
+        throw error;
+    }
+
+    var bind = typeof port === 'string'
+        ? 'Pipe ' + port
+        : 'Port ' + port;
+
+    // handle specific listen errors with friendly messages
+    switch (error.code) {
+        case 'EACCES':
+            console.error(bind + ' requires elevated privileges');
+            process.exit(1);
+            break;
+        case 'EADDRINUSE':
+            console.error(bind + ' is already in use');
+            process.exit(1);
+            break;
+        default:
+            throw error;
+    }
+}
+
+/**
+ * Event listener for HTTP server "listening" event.
+ */
+
+function onListening() {
+    var addr = server.address();
+    var bind = typeof addr === 'string'
+        ? 'pipe ' + addr
+        : 'port ' + addr.port;
+    debug('Listening on ' + bind);
+}
+
+var HTMLParser = require('node-html-parser');
+var axios = require('axios');
+var iconv = require('iconv-lite');
+
+var fs = require('fs');
+var myArray = [];
+
+(async () => {
+    let bool = true;
+    let i = 1;
+
+    /*    while (bool) {
+            const url = 'http://narcozona.ru/reabilit/page/' + i;
+            let str = await axios.get(url);
+            //console.log(str.data);
+            var myRe = /(https?):\/\/[^\\s/$.?#].[^\\s]*\.html/ig;
+
+
+            while ((res = myRe.exec(str.data)) != null) {
+                myArray.push(res[0]);
+            }
+
+            i++;
+
+            if (i === 198) {
+                bool = false;
+            }
+        }*/
+    //fs.writeFileSync('message.txt', myArray);
+    //let msg = fs.readFileSync('message.txt', 'utf8');
+
+    //console.log(msg.split(',').length);
+
+    //let url = 'http://narcozona.ru/1757-blagopriyatnoe-lechenie.html';
+    let url = 'http://narcozona.ru/1600-zaklyuchitelnaya-dezinfekciya.html';
+
+    const response = await axios.request({
+        method: 'GET',
+        url: url,
+        responseType: 'arraybuffer',
+        responseEncoding: 'binary'
+    });
+
+    //let html = iso88592.decode(response.data.toString('binary'));
+    html = iconv.encode(iconv.decode(response.data, "cp1251"), "utf8").toString();
+
+    //console.log(html);
+    //var root = HTMLParser.parse('<ul id="list"><li>Hello World</li></ul>');
+    var root = HTMLParser.parse(html);
+    //console.log(root.firstChild.structure);
+// ul#list
+//   li
+//     #text
+
+    let div = root.querySelector('#dle-content');
+
+    let ps = div.querySelector('.staticli').querySelectorAll('p');
+    ps.pop();
+    ps.shift();
+
+    let arr = div.querySelector('.staticli').querySelectorAll('p').map((item, key) => {
+        //console.log(key, item.toString())
+        return item.innerHTML;
+    }).filter((item) => item !== '' || !(/ *$/ig.test(item)));
+
+
+    let title = div.querySelector('h1').innerHTML;
+    let description = arr.join('<!-- wp:paragraph -->' +
+        '\n' +
+        '<!-- wp:paragraph -->');
+
+    console.log(title, arr);
+
+// { tagName: 'ul',
+//   rawAttrs: 'id="list"',
+//   childNodes:
+//    [ { tagName: 'li',
+//        rawAttrs: '',
+//        childNodes: [Object],
+//        classNames: [] } ],
+//   id: 'list',
+//   classNames: [] }
+    //console.log(root.toString());
+// <ul id="list"><li>Hello World</li></ul>
+    /*root.set_content('<li>Hello World</li>');
+    root.toString();	// <li>Hello World</li>*/
+})();
