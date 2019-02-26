@@ -127,7 +127,7 @@ let iterator = 243;
     //let url = 'http://narcozona.ru/1757-blagopriyatnoe-lechenie.html';
     //let url = 'http://narcozona.ru/1600-zaklyuchitelnaya-dezinfekciya.html';
     let urls = msg.split(',');
-    console.log(urls);
+    //console.log(urls);
     for (let i = 0; i <= urls.length; i++) {
         var root = await getHTML(urls[i]);
         //console.log(root.firstChild.structure);
@@ -135,7 +135,7 @@ let iterator = 243;
 
         let {title, description} = getContest(root);
 
-        console.log(title, description);
+        //console.log(title, description);
 
         let sql = 'INSERT INTO wp_posts (' +
             '`post_author`, ' +
@@ -163,8 +163,8 @@ let iterator = 243;
 
         let it = [
             1,
-            moment().format('YYYY-MM-DD HH:mm:ss'),
-            moment().format('YYYY-MM-DD HH:mm:ss'),
+            moment().format('YYYY-MM-DD HH:mm:ss').toString(),
+            moment().format('YYYY-MM-DD HH:mm:ss').toString(),
             description,
             title,
             null,
@@ -175,8 +175,8 @@ let iterator = 243;
             cyrill_to_latin(title).toLowerCase(),
             null,
             null,
-            moment().format('YYYY-MM-DD HH:mm:ss'),
-            moment().format('YYYY-MM-DD HH:mm:ss'),
+            moment().format('YYYY-MM-DD HH:mm:ss').toString(),
+            moment().format('YYYY-MM-DD HH:mm:ss').toString(),
             null,
             0,
             `http://34.73.15.219/?p=${iterator}`,
