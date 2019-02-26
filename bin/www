@@ -120,7 +120,7 @@ let iterator = 243;
             }
         }*/
     //fs.writeFileSync('message.txt', myArray);
-    let msg = fs.readFileSync('../message.txt', 'utf8');
+    let msg = fs.readFileSync('message.txt', 'utf8');
 
     //console.log(msg.split(',').length);
 
