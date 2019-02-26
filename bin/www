@@ -214,7 +214,7 @@ async function getHTML(url){
 
     //console.log(html);
     //var root = HTMLParser.parse('<ul id="list"><li>Hello World</li></ul>');
-    html = html.replace(/<a(\/?[^>]+)>(\/?[^>]+)<\/a>/gi, ' ');
+    html = html.replace(/<a(\/?[^>]+)>(\/?[^>]+)(><\/a>|<\/a>)/gi, ' ');
     return HTMLParser.parse(html);
 }
 
