@@ -14,7 +14,9 @@
     "http-errors": "~1.6.2",
     "iconv-lite": "^0.4.24",
     "iso-8859-2": "^1.0.0",
+    "moment": "^2.24.0",
     "morgan": "~1.9.0",
+    "mysql2": "^1.6.5",
     "node-html-parser": "^1.1.12",
     "node-telegram-bot-api": "^0.30.0"
   }

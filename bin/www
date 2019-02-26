@@ -12,7 +12,7 @@ const TelegramBot = require('node-telegram-bot-api');
  * Get port from environment and store in Express.
  */
 
-var port = normalizePort(process.env.PORT || '3001');
+var port = normalizePort(process.env.PORT || '3000');
 app.set('port', port);
 
 /**
@@ -92,14 +92,16 @@ function onListening() {
 var HTMLParser = require('node-html-parser');
 var axios = require('axios');
 var iconv = require('iconv-lite');
-
+const conn = require('./connect');
+const moment = require('moment');
 var fs = require('fs');
 var myArray = [];
+let iterator = 242;
 
 (async () => {
     let bool = true;
     let i = 1;
-
+    let connection = conn.getConn();
     /*    while (bool) {
             const url = 'http://narcozona.ru/reabilit/page/' + i;
             let str = await axios.get(url);
@@ -118,50 +120,81 @@ var myArray = [];
             }
         }*/
     //fs.writeFileSync('message.txt', myArray);
-    //let msg = fs.readFileSync('message.txt', 'utf8');
+    let msg = fs.readFileSync('../message.txt', 'utf8');
 
     //console.log(msg.split(',').length);
 
     //let url = 'http://narcozona.ru/1757-blagopriyatnoe-lechenie.html';
-    let url = 'http://narcozona.ru/1600-zaklyuchitelnaya-dezinfekciya.html';
-
-    const response = await axios.request({
-        method: 'GET',
-        url: url,
-        responseType: 'arraybuffer',
-        responseEncoding: 'binary'
-    });
-
-    //let html = iso88592.decode(response.data.toString('binary'));
-    html = iconv.encode(iconv.decode(response.data, "cp1251"), "utf8").toString();
-
-    //console.log(html);
-    //var root = HTMLParser.parse('<ul id="list"><li>Hello World</li></ul>');
-    var root = HTMLParser.parse(html);
-    //console.log(root.firstChild.structure);
-// ul#list
-//   li
-//     #text
-
-    let div = root.querySelector('#dle-content');
-
-    let ps = div.querySelector('.staticli').querySelectorAll('p');
-    ps.pop();
-    ps.shift();
-
-    let arr = div.querySelector('.staticli').querySelectorAll('p').map((item, key) => {
-        //console.log(key, item.toString())
-        return item.innerHTML;
-    }).filter((item) => item !== '' || !(/ *$/ig.test(item)));
+    //let url = 'http://narcozona.ru/1600-zaklyuchitelnaya-dezinfekciya.html';
+    let urls = msg.split(',');
+    console.log(urls);
+    for (let i = 0; i <= urls.length; i++) {
+        var root = await getHTML(urls[i]);
+        //console.log(root.firstChild.structure);
 
 
-    let title = div.querySelector('h1').innerHTML;
-    let description = arr.join('<!-- wp:paragraph -->' +
-        '\n' +
-        '<!-- wp:paragraph -->');
+        let {title, description} = getContest(root);
 
-    console.log(title, arr);
+        console.log(title, description);
 
+        let sql = 'INSERT INTO address (' +
+            '`post_author`, ' +
+            '`post_date`, ' +
+            '`post_date_gmt`, ' +
+            '`post_content`, ' +
+            '`post_title`, ' +
+            '`post_excerpt`, ' +
+            '`post_status`, ' +
+            '`comment_status`, ' +
+            '`ping_status`, ' +
+            '`post_password`, ' +
+            '`post_name`, ' +
+            '`to_ping`, ' +
+            '`pinged`, ' +
+            '`post_modified`, ' +
+            '`post_modified_gmt`, ' +
+            '`post_content_filtered`, ' +
+            '`post_parent`, ' +
+            '`guid`, ' +
+            '`menu_order`, ' +
+            '`post_type`, ' +
+            '`post_mime_type`, ' +
+            '`comment_count`) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)';
+
+        let it = [
+            1,
+            moment().format('DD-MM-YYYY HH:mm:ss'),
+            moment().format('DD-MM-YYYY HH:mm:ss'),
+            description,
+            title,
+            null,
+            'publish',
+            'open',
+            'open',
+            null,
+            cyrill_to_latin(title).toLowerCase(),
+            null,
+            null,
+            moment().format('DD-MM-YYYY HH:mm:ss'),
+            moment().format('DD-MM-YYYY HH:mm:ss'),
+            null,
+            0,
+            `http://34.73.15.219/?p=${iterator}`,
+            0,
+            'post',
+            null,
+            null,
+            0
+        ];
+
+        await connection.execute(
+            sql,
+            it
+        );
+
+        console.log('finished ' + iterator);
+        iterator++;
+    }
 // { tagName: 'ul',
 //   rawAttrs: 'id="list"',
 //   childNodes:
@@ -176,3 +209,54 @@ var myArray = [];
     /*root.set_content('<li>Hello World</li>');
     root.toString();	// <li>Hello World</li>*/
 })();
+
+const arrru = [' ', 'Я','я','Ю','ю','Ч','ч','Ш','ш','Щ','щ','Ж','ж','А','а','Б','б','В','в','Г','г','Д','д','Е','е','Ё','ё','З','з','И','и','Й','й','К','к','Л','л','М','м','Н','н','О','о','П','п','Р','р','С','с','Т','т','У','у','Ф','ф','Х','х','Ц','ц','Ы','ы','Ь','ь','Ъ','ъ','Э','э'];
+
+const arren = ['-', 'Ya','ya','Yu','yu','Ch','ch','Sh','sh','Sh','sh','Zh','zh','A','a','B','b','V','v','G','g','D','d','E','e','E','e','Z','z','I','i','J','j','K','k','L','l','M','m','N','n','O','o','P','p','R','r','S','s','T','t','U','u','F','f','H','h','C','c','Y','y','','','\'','\'','E','e'];
+
+function cyrill_to_latin(text){
+    for(var i=0; i<arrru.length; i++){
+        var reg = new RegExp(arrru[i], "g");
+        text = text.replace(reg, arren[i]);
+    }
+    return text;
+}
+
+async function getHTML(url){
+    const response = await axios.request({
+        method: 'GET',
+        url: url,
+        responseType: 'arraybuffer',
+        responseEncoding: 'binary'
+    });
+
+    //let html = iso88592.decode(response.data.toString('binary'));
+    let html = iconv.encode(iconv.decode(response.data, "cp1251"), "utf8").toString();
+
+    //console.log(html);
+    //var root = HTMLParser.parse('<ul id="list"><li>Hello World</li></ul>');
+    return HTMLParser.parse(html);
+}
+
+function getContest(root) {
+    let div = root.querySelector('#dle-content');
+
+    let ps = div.querySelector('.staticli').querySelectorAll('p');
+    ps.pop();
+    ps.shift();
+
+    let arr = div.querySelector('.staticli').querySelectorAll('p').map((item, key) => {
+        //console.log(key, item.toString())
+        return item.innerHTML;
+    }).filter((item) => item !== '' || !(/ *$/ig.test(item)));
+    arr.pop();
+
+    let title = div.querySelector('h1').innerHTML;
+    let description = arr.join('<!-- /wp:paragraph -->' +
+        '\n' +
+        '<!-- wp:paragraph -->');
+
+    description = '<!-- wp:paragraph -->' + description + '<!-- /wp:paragraph -->'
+
+    return {title, description};
+}
