@@ -101,7 +101,7 @@ let iterator = 243;
 (async () => {
     let bool = true;
     let i = 1;
-    //let connection = await conn.createConn();
+    let connection = await conn.createConn();
     /*    while (bool) {
             const url = 'http://narcozona.ru/reabilit/page/' + i;
             let str = await axios.get(url);
@@ -187,10 +187,10 @@ let iterator = 243;
             0
         ];
 
-/*        await connection.execute(
+        await connection.execute(
             sql,
             it
-        );*/
+        );
 
         console.log('finished ' + it);
         iterator++;
