@@ -96,12 +96,12 @@ const conn = require('./connect');
 const moment = require('moment');
 var fs = require('fs');
 var myArray = [];
-let iterator = 242;
+let iterator = 243;
 
 (async () => {
     let bool = true;
     let i = 1;
-    let connection = conn.getConn();
+    //let connection = await conn.createConn();
     /*    while (bool) {
             const url = 'http://narcozona.ru/reabilit/page/' + i;
             let str = await axios.get(url);
@@ -137,7 +137,7 @@ let iterator = 242;
 
         console.log(title, description);
 
-        let sql = 'INSERT INTO address (' +
+        let sql = 'INSERT INTO wp_posts (' +
             '`post_author`, ' +
             '`post_date`, ' +
             '`post_date_gmt`, ' +
@@ -163,8 +163,8 @@ let iterator = 242;
 
         let it = [
             1,
-            moment().format('DD-MM-YYYY HH:mm:ss'),
-            moment().format('DD-MM-YYYY HH:mm:ss'),
+            moment().format('YYYY-MM-DD HH:mm:ss'),
+            moment().format('YYYY-MM-DD HH:mm:ss'),
             description,
             title,
             null,
@@ -175,8 +175,8 @@ let iterator = 242;
             cyrill_to_latin(title).toLowerCase(),
             null,
             null,
-            moment().format('DD-MM-YYYY HH:mm:ss'),
-            moment().format('DD-MM-YYYY HH:mm:ss'),
+            moment().format('YYYY-MM-DD HH:mm:ss'),
+            moment().format('YYYY-MM-DD HH:mm:ss'),
             null,
             0,
             `http://34.73.15.219/?p=${iterator}`,
@@ -187,12 +187,12 @@ let iterator = 242;
             0
         ];
 
-        await connection.execute(
+/*        await connection.execute(
             sql,
             it
-        );
+        );*/
 
-        console.log('finished ' + iterator);
+        console.log('finished ' + it);
         iterator++;
     }
 // { tagName: 'ul',
