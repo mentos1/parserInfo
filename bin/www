@@ -126,16 +126,16 @@ let iterator = 243;
 
     //let url = 'http://narcozona.ru/1757-blagopriyatnoe-lechenie.html';
     //let url = 'http://narcozona.ru/1600-zaklyuchitelnaya-dezinfekciya.html';
+
     let urls = msg.split(',');
+    //let urls = ['http://narcozona.ru/3057-medicinskaya-vata-kak-vybrat-i-vygodno-kupit-material.html'];
     //console.log(urls);
-    for (let i = 0; i <= urls.length; i++) {
+    for (let i = 0; i < urls.length; i++) {
         var root = await getHTML(urls[i]);
         //console.log(root.firstChild.structure);
 
 
         let {title, description} = getContest(root);
-
-        //console.log(title, description);
 
         let sql = 'INSERT INTO wp_posts (`post_author`, `post_date`, `post_date_gmt`, `post_content`, `post_title`, `post_excerpt`, `post_status`, `comment_status`, `ping_status`, `post_password`, `post_name`, `to_ping`, `pinged`, `post_modified`, `post_modified_gmt`, `post_content_filtered`, `post_parent`, `guid`, `menu_order`, `post_type`, `post_mime_type`, `comment_count`) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)';
 
@@ -169,7 +169,7 @@ let iterator = 243;
             it
         );
 
-        console.log('finished ' + it);
+        console.log('finished ', iterator);
         iterator++;
     }
 // { tagName: 'ul',
@@ -212,15 +212,12 @@ async function getHTML(url){
 
     //console.log(html);
     //var root = HTMLParser.parse('<ul id="list"><li>Hello World</li></ul>');
+    html = html.replace(/<a(\/?[^>]+)>(\/?[^>]+)<\/a>/gi, ' ');
     return HTMLParser.parse(html);
 }
 
 function getContest(root) {
     let div = root.querySelector('#dle-content');
-
-    let ps = div.querySelector('.staticli').querySelectorAll('p');
-    ps.pop();
-    ps.shift();
 
     let arr = div.querySelector('.staticli').querySelectorAll('p').map((item, key) => {
         //console.log(key, item.toString())
@@ -229,11 +226,13 @@ function getContest(root) {
     arr.pop();
 
     let title = div.querySelector('h1').innerHTML;
-    let description = arr.join('<!-- /wp:paragraph -->' +
+    let description = div.querySelector('.staticli').innerHTML;
+    return {title, description};
+    /*let description = arr.join('<!-- /wp:paragraph -->' +
         '\n' +
         '<!-- wp:paragraph -->');
 
     description = '<!-- wp:paragraph -->' + description + '<!-- /wp:paragraph -->'
 
-    return {title, description};
+    return {title, description};*/
 }
