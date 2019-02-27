@@ -96,30 +96,24 @@ const conn = require('./connect');
 const moment = require('moment');
 var fs = require('fs');
 var myArray = [];
-let iterator = 243;
+let iterator = 289;
 
 (async () => {
     let bool = true;
     let i = 1;
     let connection = await conn.createConn();
-    /*    while (bool) {
-            const url = 'http://narcozona.ru/reabilit/page/' + i;
-            let str = await axios.get(url);
-            //console.log(str.data);
-            var myRe = /(https?):\/\/[^\\s/$.?#].[^\\s]*\.html/ig;
+
+    //let xml = await axios.get('http://narcozona.ru/sitemap.xml');
+    //console.log(xml.data);
+    //var myRe = /(https?):\/\/(.+).html/ig;
 
 
-            while ((res = myRe.exec(str.data)) != null) {
-                myArray.push(res[0]);
-            }
+/*    while ((res = myRe.exec(xml.data)) != null) {
+        console.log(res[0]);
+        myArray.push(res[0]);
+    }
 
-            i++;
-
-            if (i === 198) {
-                bool = false;
-            }
-        }*/
-    //fs.writeFileSync('message.txt', myArray);
+    fs.writeFileSync('message.txt', myArray);*/
     let msg = fs.readFileSync('message.txt', 'utf8');
 
     //console.log(msg.split(',').length);
@@ -134,8 +128,12 @@ let iterator = 243;
         var root = await getHTML(urls[i]);
         //console.log(root.firstChild.structure);
 
+        let data = getContest(root);
+        if (data === null) {
+            continue;
+        }
 
-        let {title, description} = getContest(root);
+        let {title, description} = data;
 
         let sql = 'INSERT INTO wp_posts (`post_author`, `post_date`, `post_date_gmt`, `post_content`, `post_title`, `post_excerpt`, `post_status`, `comment_status`, `ping_status`, `post_password`, `post_name`, `to_ping`, `pinged`, `post_modified`, `post_modified_gmt`, `post_content_filtered`, `post_parent`, `guid`, `menu_order`, `post_type`, `post_mime_type`, `comment_count`) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)';
 
@@ -189,19 +187,19 @@ let iterator = 243;
     root.toString();	// <li>Hello World</li>*/
 })();
 
-const arrru = ['–', ' ', 'Я','я','Ю','ю','Ч','ч','Ш','ш','Щ','щ','Ж','ж','А','а','Б','б','В','в','Г','г','Д','д','Е','е','Ё','ё','З','з','И','и','Й','й','К','к','Л','л','М','м','Н','н','О','о','П','п','Р','р','С','с','Т','т','У','у','Ф','ф','Х','х','Ц','ц','Ы','ы','Ь','ь','Ъ','ъ','Э','э'];
+const arrru = ['–', ' ', 'Я', 'я', 'Ю', 'ю', 'Ч', 'ч', 'Ш', 'ш', 'Щ', 'щ', 'Ж', 'ж', 'А', 'а', 'Б', 'б', 'В', 'в', 'Г', 'г', 'Д', 'д', 'Е', 'е', 'Ё', 'ё', 'З', 'з', 'И', 'и', 'Й', 'й', 'К', 'к', 'Л', 'л', 'М', 'м', 'Н', 'н', 'О', 'о', 'П', 'п', 'Р', 'р', 'С', 'с', 'Т', 'т', 'У', 'у', 'Ф', 'ф', 'Х', 'х', 'Ц', 'ц', 'Ы', 'ы', 'Ь', 'ь', 'Ъ', 'ъ', 'Э', 'э'];
 
-const arren = ['-', '-', 'Ya','ya','Yu','yu','Ch','ch','Sh','sh','Sh','sh','Zh','zh','A','a','B','b','V','v','G','g','D','d','E','e','E','e','Z','z','I','i','J','j','K','k','L','l','M','m','N','n','O','o','P','p','R','r','S','s','T','t','U','u','F','f','H','h','C','c','Y','y','','','\'','\'','E','e'];
+const arren = ['-', '-', 'Ya', 'ya', 'Yu', 'yu', 'Ch', 'ch', 'Sh', 'sh', 'Sh', 'sh', 'Zh', 'zh', 'A', 'a', 'B', 'b', 'V', 'v', 'G', 'g', 'D', 'd', 'E', 'e', 'E', 'e', 'Z', 'z', 'I', 'i', 'J', 'j', 'K', 'k', 'L', 'l', 'M', 'm', 'N', 'n', 'O', 'o', 'P', 'p', 'R', 'r', 'S', 's', 'T', 't', 'U', 'u', 'F', 'f', 'H', 'h', 'C', 'c', 'Y', 'y', '', '', '\'', '\'', 'E', 'e'];
 
-function cyrill_to_latin(text){
-    for(var i=0; i<arrru.length; i++){
+function cyrill_to_latin(text) {
+    for (var i = 0; i < arrru.length; i++) {
         var reg = new RegExp(arrru[i], "g");
         text = text.replace(reg, arren[i]);
     }
     return text.replace(/-+/gm, '-');
 }
 
-async function getHTML(url){
+async function getHTML(url) {
     const response = await axios.request({
         method: 'GET',
         url: url,
@@ -220,6 +218,10 @@ async function getHTML(url){
 
 function getContest(root) {
     let div = root.querySelector('#dle-content');
+
+    if (!div) {
+        return null;
+    }
 
     let arr = div.querySelector('.staticli').querySelectorAll('p').map((item, key) => {
         //console.log(key, item.toString())
