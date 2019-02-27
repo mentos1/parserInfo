@@ -96,7 +96,7 @@ const conn = require('./connect');
 const moment = require('moment');
 var fs = require('fs');
 var myArray = [];
-let iterator = 289;
+let iterator = 2315;
 
 (async () => {
     let bool = true;
@@ -224,7 +224,7 @@ async function getHTML(url) {
 function getContest(root) {
     let div = root.querySelector('#dle-content');
 
-    if (!div) {
+    if (!div || !div.querySelector('.staticli')) {
         return null;
     }
 
