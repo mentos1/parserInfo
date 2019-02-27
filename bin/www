@@ -96,7 +96,7 @@ const conn = require('./connect');
 const moment = require('moment');
 var fs = require('fs');
 var myArray = [];
-let iterator = 2315;
+let iterator = 289;
 
 (async () => {
     let bool = true;
