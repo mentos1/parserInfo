@@ -96,7 +96,7 @@ const conn = require('./connect');
 const moment = require('moment');
 var fs = require('fs');
 var myArray = [];
-let iterator = 289;
+let iterator = 5;
 
 (async () => {
     let bool = true;
@@ -156,7 +156,7 @@ let iterator = 289;
             moment().format('YYYY-MM-DD HH:mm:ss').toString(),
             '',
             0,
-            `http://34.73.15.219/?p=${iterator}`,
+            `http://www.narkozavisimost.info/?p=${iterator}`,
             0,
             'post',
             '',
