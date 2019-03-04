@@ -102,7 +102,7 @@ let iterator = 5;
     let bool = true;
     let i = 1;
     let connection = await conn.createConn();
-
+    await updateLink(connection);
     //let xml = await axios.get('http://narcozona.ru/sitemap.xml');
     //console.log(xml.data);
     //var myRe = /(https?):\/\/(.+).html/ig;
@@ -114,17 +114,17 @@ let iterator = 5;
     }
 
     fs.writeFileSync('message.txt', myArray);*/
-    let msg = fs.readFileSync('message.txt', 'utf8');
+    //let msg = fs.readFileSync('message.txt', 'utf8');
 
     //console.log(msg.split(',').length);
 
     //let url = 'http://narcozona.ru/1757-blagopriyatnoe-lechenie.html';
     //let url = 'http://narcozona.ru/1600-zaklyuchitelnaya-dezinfekciya.html';
 
-    let urls = msg.split(',');
+    //let urls = msg.split(',');
     //let urls = ['http://narcozona.ru/3057-medicinskaya-vata-kak-vybrat-i-vygodno-kupit-material.html'];
     //console.log(urls);
-    for (let i = 0; i < urls.length; i++) {
+    /*for (let i = 0; i < urls.length; i++) {
         console.log('url ', urls[i]);
         var root = await getHTML(urls[i]);
         //console.log(root.firstChild.structure);
@@ -170,7 +170,7 @@ let iterator = 5;
 
         console.log('finished ', iterator);
         iterator++;
-    }
+    }*/
 
 
 // { tagName: 'ul',
@@ -246,4 +246,26 @@ function getContest(root) {
     description = '<!-- wp:paragraph -->' + description + '<!-- /wp:paragraph -->'
 
     return {title, description};*/
+}
+
+async function updateLink(connection) {
+
+    let [rows] = await connection.execute('SELECT * FROM `wp_posts`');
+
+    let response = [...rows];
+
+    for (let it in response) {
+        const sql = 'UPDATE `wp_posts` SET `wp_posts`.`post_content` = ? WHERE `wp_posts`.`id`=?';
+
+        connection.execute(sql,
+            [
+                response[it].post_content.replace(/http:\/\/www\./g,'https://'),
+                response[it].id
+            ]
+        );
+
+        console.log('done ', it);
+    }
+
+
 }
