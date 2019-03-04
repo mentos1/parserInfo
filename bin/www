@@ -253,6 +253,9 @@ async function updateLink(connection) {
     let [rows] = await connection.execute('SELECT * FROM `wp_posts`');
 
     let response = [...rows];
+    console.log("----------response--------");
+    console.log(response);
+    console.log("----------response--------");
 
     for (let it in response) {
         const sql = 'UPDATE `wp_posts` SET `wp_posts`.`post_content` = ? WHERE `wp_posts`.`id`=?';
