@@ -257,7 +257,11 @@ async function updateLink(connection) {
     for (let it in response) {
         const sql = 'UPDATE `wp_posts` SET `wp_posts`.`post_content` = ? WHERE `wp_posts`.`id`=?';
 
-        connection.execute(sql,
+        if (!response[it] || !response[it].post_content) {
+            continue;
+        }
+
+        await connection.execute(sql,
             [
                 response[it].post_content.replace(/http:\/\/www\./g,'https://'),
                 response[it].id
