@@ -102,7 +102,7 @@ let iterator = 5;
     let bool = true;
     let i = 1;
     let connection = await conn.createConn();
-    await updateLink(connection);
+    await addImage(connection);
     //let xml = await axios.get('http://narcozona.ru/sitemap.xml');
     //console.log(xml.data);
     //var myRe = /(https?):\/\/(.+).html/ig;
@@ -248,7 +248,7 @@ function getContest(root) {
     return {title, description};*/
 }
 
-async function updateLink(connection) {
+/*async function updateLink(connection) {
 
     let [rows] = await connection.execute('SELECT * FROM `wp_posts`');
 
@@ -272,4 +272,43 @@ async function updateLink(connection) {
     }
 
 
+}*/
+
+
+async function addImage(connection) {
+
+    let [rows] = await connection.execute('SELECT * FROM `wp_posts` where `post_type`="post"');
+
+    let response = [...rows];
+
+    for (let it in response) {
+        const sql = 'INSERT INTO `wp_postmeta` (post_id, meta_key, meta_value) VALUES (?, ?, ?)';
+
+        if (!response[it] || !response[it].post_content) {
+            continue;
+        }
+
+        if (parseInt(response[it].ID) === 2625) {
+            continue;
+        }
+
+        await connection.execute(sql,
+            [
+                response[it].ID,
+                '_thumbnail_id',
+                randomInteger(2642, 2722)
+            ]
+        );
+
+        console.log('done ', it);
+    }
+
+
+}
+
+
+function randomInteger(min, max) {
+    var rand = min + Math.random() * (max - min)
+    rand = Math.round(rand);
+    return rand;
 }
