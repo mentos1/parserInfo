@@ -102,32 +102,31 @@ let iterator = 5;
     let bool = true;
     let i = 1;
     let connection = await conn.createConn();
-    await addImage(connection);
-    //let xml = await axios.get('http://narcozona.ru/sitemap.xml');
-    //console.log(xml.data);
-    //var myRe = /(https?):\/\/(.+).html/ig;
+    //await addImage(connection);
+/*    let xml = await axios.get('https://topsexshop.com.ua/sitemap2.xml');
+    console.log(xml.data);
+    var myRe = /(https?):\/\/(.+).html/ig;
 
-
-/*    while ((res = myRe.exec(xml.data)) != null) {
+    while ((res = myRe.exec(xml.data)) != null) {
         console.log(res[0]);
         myArray.push(res[0]);
     }
 
     fs.writeFileSync('message.txt', myArray);*/
-    //let msg = fs.readFileSync('message.txt', 'utf8');
+    let msg = fs.readFileSync('message.txt', 'utf8');
 
     //console.log(msg.split(',').length);
 
     //let url = 'http://narcozona.ru/1757-blagopriyatnoe-lechenie.html';
     //let url = 'http://narcozona.ru/1600-zaklyuchitelnaya-dezinfekciya.html';
 
-    //let urls = msg.split(',');
-    //let urls = ['http://narcozona.ru/3057-medicinskaya-vata-kak-vybrat-i-vygodno-kupit-material.html'];
+    let urls = msg.split(',');
+    //let urls = ['https://topsexshop.com.ua/blog/10-idej-dlja-seksa-bez-polovogo-akta.html'];
     //console.log(urls);
-    /*for (let i = 0; i < urls.length; i++) {
+    for (let i = 0; i < urls.length; i++) {
         console.log('url ', urls[i]);
         var root = await getHTML(urls[i]);
-        //console.log(root.firstChild.structure);
+
 
         let data = getContest(root);
         if (data === null) {
@@ -170,7 +169,7 @@ let iterator = 5;
 
         console.log('finished ', iterator);
         iterator++;
-    }*/
+    }
 
 
 // { tagName: 'ul',
@@ -207,16 +206,20 @@ async function getHTML(url) {
         const response = await axios.request({
             method: 'GET',
             url: url,
-            responseType: 'arraybuffer',
-            responseEncoding: 'binary'
+            //responseType: 'arraybuffer',
+            //responseEncoding: 'binary'
         });
-        //let html = iso88592.decode(response.data.toString('binary'));
-        let html = iconv.encode(iconv.decode(response.data, "cp1251"), "utf8").toString();
 
-        //console.log(html);
-        //var root = HTMLParser.parse('<ul id="list"><li>Hello World</li></ul>');
-        html = html.replace(/<a(\/?[^>]+)>(\/?[^>]+)(><\/a>|<\/a>)/gi, ' ');
+        let html = response.data.replace(/<a(\/?[^>]+)>(\/?[^>]+)(><\/a>|<\/a>)/gi, ' ');
         return HTMLParser.parse(html);
+
+
+        //let html = iso88592.decode(response.data.toString('binary'));
+        //let html = iconv.encode(iconv.decode(response.data, "cp1251"), "utf8").toString();
+
+        //var root = HTMLParser.parse('<ul id="list"><li>Hello World</li></ul>');
+        //html = html.replace(/<a(\/?[^>]+)>(\/?[^>]+)(><\/a>|<\/a>)/gi, ' ');
+        //return HTMLParser.parse(html);
     } catch (e) {
         console.error('bad url: ', url);
         return HTMLParser.parse('<b></b>');
@@ -224,20 +227,13 @@ async function getHTML(url) {
 }
 
 function getContest(root) {
-    let div = root.querySelector('#dle-content');
 
-    if (!div || !div.querySelector('.staticli')) {
+    if (!root.querySelector('#content')|| !root.querySelector('.cat-header')) {
         return null;
     }
 
-    let arr = div.querySelector('.staticli').querySelectorAll('p').map((item, key) => {
-        //console.log(key, item.toString())
-        return item.innerHTML;
-    }).filter((item) => item !== '' || !(/ *$/ig.test(item)));
-    arr.pop();
-
-    let title = div.querySelector('h1').innerHTML;
-    let description = div.querySelector('.staticli').innerHTML;
+    let title = root.querySelector('.cat-header').innerHTML;
+    let description = root.querySelector('#content').querySelector('.col-sm-8').innerHTML;
     return {title, description};
     /*let description = arr.join('<!-- /wp:paragraph -->' +
         '\n' +

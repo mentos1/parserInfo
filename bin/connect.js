@@ -6,7 +6,7 @@ async function createConn() {
         host: '127.0.0.1',
         user: 'mentos1',
         password: '@M0VaoHnJk8bB0YT',
-        database: 'narkozavisimost'
+        database: 'sexywomen'
     });
     return conn;
 }
