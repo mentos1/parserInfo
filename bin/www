@@ -101,14 +101,14 @@ let iterator = 86;
 (async () => {
     let bool = true;
     let i = 1;
-    let connection = await conn.createConn();
-    addImage(connection)
+    //let connection = await conn.createConn();
+    //addImage(connection)
     //await addImage(connection);
-    /*let xml = await axios.get('https://topsexshop.com.ua/sitemap2.xml');
-    console.log(xml.data);*/
+/*    let xml = await axios.get('https://www.allwomens.ru/sitemap.xml');
+    console.log(xml.data);
 
 
-/*    var myRe = /(https?):\/\/(.+)(?=<\/loc>|\n<\/loc>)/ig;
+    var myRe = /(https?):\/\/(.+)(?=<\/loc>|\n<\/loc>)/ig;
 
     while ((res = myRe.exec(xml.data)) != null) {
         console.log(res[0]);
@@ -116,27 +116,30 @@ let iterator = 86;
     }
 
     fs.writeFileSync('message.txt', myArray);*/
-    //let msg = fs.readFileSync('message.txt', 'utf8');
+    let msg = fs.readFileSync('message.txt', 'utf8');
 
-    //console.log(msg.split(',').length);
+    console.log(msg.split(','));
 
     //let url = 'http://narcozona.ru/1757-blagopriyatnoe-lechenie.html';
     //let url = 'http://narcozona.ru/1600-zaklyuchitelnaya-dezinfekciya.html';
 
-    //let urls = msg.split(',');
-    //let urls = ['https://topsexshop.com.ua/blog/10-idej-dlja-seksa-bez-polovogo-akta.html'];
+    let urls = msg.split(',');
+    //let urls = ['https://www.allwomens.ru/15240-svadebnyy-makiyazh-dlya-bryunetok.html'];
     //console.log(urls);
-    /*for (let i = 0; i < urls.length; i++) {
+    for (let i = 0; i < urls.length; i++) {
         console.log('url ', urls[i]);
         var root = await getHTML(urls[i]);
 
 
         let data = getContest(root);
+        console.log(data);
         if (data === null) {
             continue;
         }
 
         let {title, description} = data;
+
+        console.log(title, description);
 
         let sql = 'INSERT INTO wp_posts (`post_author`, `post_date`, `post_date_gmt`, `post_content`, `post_title`, `post_excerpt`, `post_status`, `comment_status`, `ping_status`, `post_password`, `post_name`, `to_ping`, `pinged`, `post_modified`, `post_modified_gmt`, `post_content_filtered`, `post_parent`, `guid`, `menu_order`, `post_type`, `post_mime_type`, `comment_count`) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)';
 
@@ -165,14 +168,14 @@ let iterator = 86;
             0
         ];
 
-        await connection.execute(
+/*        await connection.execute(
             sql,
             it
-        );
+        );*/
 
         console.log('finished ', iterator);
         iterator++;
-    }*/
+    }
 
 
 // { tagName: 'ul',
@@ -209,20 +212,20 @@ async function getHTML(url) {
         const response = await axios.request({
             method: 'GET',
             url: url,
-            //responseType: 'arraybuffer',
-            //responseEncoding: 'binary'
+            responseType: 'arraybuffer',
+            responseEncoding: 'binary'
         });
 
-        let html = response.data.replace(/<a(\/?[^>]+)>(\/?[^>]+)(><\/a>|<\/a>)/gi, ' ');
-        return HTMLParser.parse(html);
+        /*let html = response.data.replace(/<a(\/?[^>]+)>(\/?[^>]+)(><\/a>|<\/a>)/gi, ' ');
+        return HTMLParser.parse(html);*/
 
 
         //let html = iso88592.decode(response.data.toString('binary'));
-        //let html = iconv.encode(iconv.decode(response.data, "cp1251"), "utf8").toString();
+        let html = iconv.encode(iconv.decode(response.data, "cp1251"), "utf8").toString();
 
         //var root = HTMLParser.parse('<ul id="list"><li>Hello World</li></ul>');
-        //html = html.replace(/<a(\/?[^>]+)>(\/?[^>]+)(><\/a>|<\/a>)/gi, ' ');
-        //return HTMLParser.parse(html);
+        html = html.replace(/<a(\/?[^>]+)>(\/?[^>]+)(><\/a>|<\/a>)/gi, ' ');
+        return HTMLParser.parse(html);
     } catch (e) {
         console.error('bad url: ', url, e);
         return HTMLParser.parse('<b></b>');
@@ -230,15 +233,25 @@ async function getHTML(url) {
 }
 
 function getContest(root) {
-    if (!root.querySelector('.padding-top')) {
+    if (!root.querySelector('article')) {
         return null;
     }
 
-    let title = root.querySelector('.padding-top').querySelector('h1').innerHTML;
-    let description = root.querySelector('.col-md-12').innerHTML;
-    description = description.replace(/<h1>.+<.h1>/gi, '');
-    description = description.replace(/<img.+>/gi, '');
-    description = description.replace(/  +|\n/gi, '');
+    let title = root.querySelector('.title').innerHTML, sstory = '', fstory = '';
+    if (root.querySelector('.sstory') && root.querySelector('.sstory').querySelector('p')){
+        sstory = root.querySelector('.sstory').querySelector('p').innerHTML;
+    }
+
+    if (root.querySelector('.fstory') && root.querySelector('.fstory')){
+        fstory = root.querySelector('.fstory').innerHTML;
+        fstory = fstory.replace(/<script.+(<\/script>|\/>)/gi, '');
+        fstory = fstory.replace(/<img.+>/gi, '');
+        fstory = fstory.replace(/  +|\n/gi, '');
+    }
+
+
+    let description = sstory + fstory;
+
     return {title, description};
     /*let description = arr.join('<!-- /wp:paragraph -->' +
         '\n' +
