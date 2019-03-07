@@ -101,9 +101,9 @@ let iterator = 725;
 (async () => {
     let bool = true;
     let i = 1;
-    //let connection = await conn.createConn();
+    let connection = await conn.createConn();
     //addImage(connection)
-    await addImage(connection);
+    //await addImage(connection);
 /*    let xml = await axios.get('https://www.allwomens.ru/sitemap.xml');
     console.log(xml.data);
 
