@@ -96,7 +96,7 @@ const conn = require('./connect');
 const moment = require('moment');
 var fs = require('fs');
 var myArray = [];
-let iterator = 86;
+let iterator = 725;
 
 (async () => {
     let bool = true;
@@ -118,13 +118,13 @@ let iterator = 86;
     fs.writeFileSync('message.txt', myArray);*/
     let msg = fs.readFileSync('message.txt', 'utf8');
 
-    console.log(msg.split(','));
+    //console.log(msg.split(','));
 
     //let url = 'http://narcozona.ru/1757-blagopriyatnoe-lechenie.html';
     //let url = 'http://narcozona.ru/1600-zaklyuchitelnaya-dezinfekciya.html';
 
-    //let urls = msg.split(',');
-    let urls = ['https://www.allwomens.ru/43055-vera-brezhneva-zaschitila-muzha-v-konflikte-s-mband.html'];
+    let urls = msg.split(',');
+    //let urls = ['https://www.allwomens.ru/43055-vera-brezhneva-zaschitila-muzha-v-konflikte-s-mband.html'];
     //console.log(urls);
     for (let i = 0; i < urls.length; i++) {
         console.log('url ', urls[i]);
@@ -132,7 +132,6 @@ let iterator = 86;
 
 
         let data = getContest(root);
-        console.log(data);
         if (data === null) {
             continue;
         }
