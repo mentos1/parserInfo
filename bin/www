@@ -101,7 +101,7 @@ let iterator = 725;
 (async () => {
     let bool = true;
     let i = 1;
-    let connection = await conn.createConn();
+    //let connection = await conn.createConn();
     //addImage(connection)
     //await addImage(connection);
 /*    let xml = await axios.get('https://www.allwomens.ru/sitemap.xml');
@@ -132,7 +132,8 @@ let iterator = 725;
 
 
         let data = getContest(root);
-        if (data === null) {
+        console.log(data);
+        if (data === null || (data.title === '' || / +$/gm.test(data.title)) || (data.description === '' || / +$/gm.test(data.description))) {
             continue;
         }
 
