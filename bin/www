@@ -102,7 +102,7 @@ let iterator = 86;
     let bool = true;
     let i = 1;
     let connection = await conn.createConn();
-    updateLink(connection)
+    addImage(connection)
     //await addImage(connection);
     /*let xml = await axios.get('https://topsexshop.com.ua/sitemap2.xml');
     console.log(xml.data);*/
@@ -297,7 +297,7 @@ async function addImage(connection) {
             [
                 response[it].ID,
                 '_thumbnail_id',
-                randomInteger(2642, 2722)
+                randomInteger(660, 719)
             ]
         );
 
