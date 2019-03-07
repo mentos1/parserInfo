@@ -101,7 +101,7 @@ let iterator = 86;
 (async () => {
     let bool = true;
     let i = 1;
-    //let connection = await conn.createConn();
+    let connection = await conn.createConn();
     //addImage(connection)
     //await addImage(connection);
 /*    let xml = await axios.get('https://www.allwomens.ru/sitemap.xml');
@@ -123,8 +123,8 @@ let iterator = 86;
     //let url = 'http://narcozona.ru/1757-blagopriyatnoe-lechenie.html';
     //let url = 'http://narcozona.ru/1600-zaklyuchitelnaya-dezinfekciya.html';
 
-    let urls = msg.split(',');
-    //let urls = ['https://www.allwomens.ru/15240-svadebnyy-makiyazh-dlya-bryunetok.html'];
+    //let urls = msg.split(',');
+    let urls = ['https://www.allwomens.ru/43055-vera-brezhneva-zaschitila-muzha-v-konflikte-s-mband.html'];
     //console.log(urls);
     for (let i = 0; i < urls.length; i++) {
         console.log('url ', urls[i]);
@@ -168,10 +168,10 @@ let iterator = 86;
             0
         ];
 
-/*        await connection.execute(
+        await connection.execute(
             sql,
             it
-        );*/
+        );
 
         console.log('finished ', iterator);
         iterator++;
