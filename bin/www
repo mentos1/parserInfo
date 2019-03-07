@@ -102,9 +102,10 @@ let iterator = 86;
     let bool = true;
     let i = 1;
     let connection = await conn.createConn();
+    updateLink(connection)
     //await addImage(connection);
-    let xml = await axios.get('https://topsexshop.com.ua/sitemap2.xml');
-    console.log(xml.data);
+    /*let xml = await axios.get('https://topsexshop.com.ua/sitemap2.xml');
+    console.log(xml.data);*/
 
 
 /*    var myRe = /(https?):\/\/(.+)(?=<\/loc>|\n<\/loc>)/ig;
@@ -115,17 +116,17 @@ let iterator = 86;
     }
 
     fs.writeFileSync('message.txt', myArray);*/
-    let msg = fs.readFileSync('message.txt', 'utf8');
+    //let msg = fs.readFileSync('message.txt', 'utf8');
 
     //console.log(msg.split(',').length);
 
     //let url = 'http://narcozona.ru/1757-blagopriyatnoe-lechenie.html';
     //let url = 'http://narcozona.ru/1600-zaklyuchitelnaya-dezinfekciya.html';
 
-    let urls = msg.split(',');
+    //let urls = msg.split(',');
     //let urls = ['https://topsexshop.com.ua/blog/10-idej-dlja-seksa-bez-polovogo-akta.html'];
-    console.log(urls);
-    for (let i = 0; i < urls.length; i++) {
+    //console.log(urls);
+    /*for (let i = 0; i < urls.length; i++) {
         console.log('url ', urls[i]);
         var root = await getHTML(urls[i]);
 
@@ -171,7 +172,7 @@ let iterator = 86;
 
         console.log('finished ', iterator);
         iterator++;
-    }
+    }*/
 
 
 // { tagName: 'ul',
@@ -248,22 +249,22 @@ function getContest(root) {
     return {title, description};*/
 }
 
-/*async function updateLink(connection) {
+async function updateLink(connection) {
 
-    let [rows] = await connection.execute('SELECT * FROM `wp_posts`');
+    let [rows] = await connection.execute("select * from wp_posts where post_status='future'");
 
     let response = [...rows];
 
     for (let it in response) {
-        const sql = 'UPDATE `wp_posts` SET `wp_posts`.`guid` = ? WHERE `wp_posts`.`id`=?';
+        const sql = 'UPDATE `wp_posts` SET `wp_posts`.`post_status` = ? WHERE `wp_posts`.`id`=?';
 
-        if (!response[it] || !response[it].post_content) {
+        if (!response[it]) {
             continue;
         }
 
         await connection.execute(sql,
             [
-                response[it].guid.replace(/http:\/\/www\./g,'https://'),
+                'publish',
                 response[it].ID
             ]
         );
@@ -272,7 +273,7 @@ function getContest(root) {
     }
 
 
-}*/
+}
 
 
 async function addImage(connection) {
