@@ -96,16 +96,18 @@ const conn = require('./connect');
 const moment = require('moment');
 var fs = require('fs');
 var myArray = [];
-let iterator = 5;
+let iterator = 86;
 
 (async () => {
     let bool = true;
     let i = 1;
     let connection = await conn.createConn();
     //await addImage(connection);
-/*    let xml = await axios.get('https://topsexshop.com.ua/sitemap2.xml');
+    let xml = await axios.get('https://topsexshop.com.ua/sitemap2.xml');
     console.log(xml.data);
-    var myRe = /(https?):\/\/(.+).html/ig;
+
+
+/*    var myRe = /(https?):\/\/(.+)(?=<\/loc>|\n<\/loc>)/ig;
 
     while ((res = myRe.exec(xml.data)) != null) {
         console.log(res[0]);
@@ -122,7 +124,7 @@ let iterator = 5;
 
     let urls = msg.split(',');
     //let urls = ['https://topsexshop.com.ua/blog/10-idej-dlja-seksa-bez-polovogo-akta.html'];
-    //console.log(urls);
+    console.log(urls);
     for (let i = 0; i < urls.length; i++) {
         console.log('url ', urls[i]);
         var root = await getHTML(urls[i]);
@@ -221,19 +223,21 @@ async function getHTML(url) {
         //html = html.replace(/<a(\/?[^>]+)>(\/?[^>]+)(><\/a>|<\/a>)/gi, ' ');
         //return HTMLParser.parse(html);
     } catch (e) {
-        console.error('bad url: ', url);
+        console.error('bad url: ', url, e);
         return HTMLParser.parse('<b></b>');
     }
 }
 
 function getContest(root) {
-
-    if (!root.querySelector('#content')|| !root.querySelector('.cat-header')) {
+    if (!root.querySelector('.padding-top')) {
         return null;
     }
 
-    let title = root.querySelector('.cat-header').innerHTML;
-    let description = root.querySelector('#content').querySelector('.col-sm-8').innerHTML;
+    let title = root.querySelector('.padding-top').querySelector('h1').innerHTML;
+    let description = root.querySelector('.col-md-12').innerHTML;
+    description = description.replace(/<h1>.+<.h1>/gi, '');
+    description = description.replace(/<img.+>/gi, '');
+    description = description.replace(/  +|\n/gi, '');
     return {title, description};
     /*let description = arr.join('<!-- /wp:paragraph -->' +
         '\n' +
